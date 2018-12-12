@@ -177,7 +177,8 @@ static void tiva_sim_task(void *pv)
 {
     // TODO: Command to change password and save it to eproom
     tiva_sim_handle_t sim_handle = (tiva_sim_handle_t)pv;
-    tiva_logi("Reach sim task", 14);
+//    tiva_logi("Reach sim task", 14);
+    TIVA_LOGE("this is log %d", (int)10);
      // setup module sim
     while (1) {
         if (!_at_and_expect(sim_handle, "AT+CREG?\r\n", "+CREG: 0,1", 1000, 5)) {
