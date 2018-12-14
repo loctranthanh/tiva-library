@@ -30,7 +30,7 @@
 #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
 #define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_GREEN)
 #define LOG_COLOR_D       LOG_COLOR(LOG_COLOR_CYAN)
-#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " " format LOG_RESET_COLOR "\r\n"
+#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " %s: " format LOG_RESET_COLOR "\r\n"
 
 typedef struct {
     bool enable_log_info;
@@ -50,12 +50,12 @@ void tiva_log_init(tiva_log_config_t log_config);
 
 bool tiva_log(int level, char* format, ...);
 
-#define TIVA_LOGE(format, ...) tiva_log(0, LOG_FORMAT(E, format), ##__VA_ARGS__)
+#define TIVA_LOGE(tag, format, ...) tiva_log(0, LOG_FORMAT(E, format), tag, ##__VA_ARGS__)
 
-#define TIVA_LOGI(format, ...) tiva_log(1, LOG_FORMAT(I, format), ##__VA_ARGS__)
+#define TIVA_LOGI(tag, format, ...) tiva_log(1, LOG_FORMAT(I, format), tag, ##__VA_ARGS__)
 
-#define TIVA_LOGD(format, ...) tiva_log(2, LOG_FORMAT(D, format), ##__VA_ARGS__)
+#define TIVA_LOGD(tag, format, ...) tiva_log(2, LOG_FORMAT(D, format), tag, ##__VA_ARGS__)
 
-#define TIVA_LOGW(format, ...) tiva_log(3, LOG_FORMAT(W, format), ##__VA_ARGS__)
+#define TIVA_LOGW(tag, format, ...) tiva_log(3, LOG_FORMAT(W, format), tag, ##__VA_ARGS__)
 
 #endif /* _TIVA_LOG_H_ */

@@ -15,6 +15,7 @@
 #include "tiva_log.h"
 
 #define MAX_MESSAGE_IN_QUEUE    10
+#define TAG                     "SIM"
 
 typedef struct tiva_sim_ {
     hw_uart_handle_t    uart_handle;
@@ -64,7 +65,7 @@ static bool _at_and_get_response(tiva_sim_handle_t sim_handle, const char *cmd, 
     }
     if (recv_len > 0) {
         sim_handle->buffer[recv_len] = '\0';
-        tiva_logi(sim_handle->buffer, recv_len + 1);
+        TIVA_LOGI(TAG, "Rec: %s", sim_handle->buffer);
         memcpy(out, sim_handle->buffer, recv_len + 1);
         return true;
     }
@@ -150,18 +151,18 @@ bool is_new_message(char* message)
 static bool tiva_sim_process_send_message(tiva_sim_handle_t sim_handle, char* message, const char* phone_num)
 {
     if (!_at_and_expect(sim_handle, "AT\r\n", "OK", 200, 3)) {
-        tiva_logi("fail AT", 7);
+        TIVA_LOGI(TAG, "fail AT");
         return false;
     }
     if (!_at_and_expect(sim_handle, "AT+CMGF=1\r\n", "OK", 200, 3)) {
-        tiva_logi("fail AT+CMGF=1", 14);
+        TIVA_LOGI(TAG, "fail AT+CMGF=1");
         return false;
     }
     char s_phone[30];
     int len = sprintf(s_phone, "AT+CMGS=\"%s\"\r\n", phone_num);
     s_phone[len] = '\0';
     if (!_at_and_expect(sim_handle, s_phone, ">", 200, 3)) {
-        tiva_logi("fail CMGS", 9);
+        TIVA_LOGI(TAG,"fail CMGS");
         return false;
     }
     _at_and_expect(sim_handle, message, NULL, 200, 3);
@@ -175,22 +176,19 @@ static bool tiva_sim_process_send_message(tiva_sim_handle_t sim_handle, char* me
 
 static void tiva_sim_task(void *pv)
 {
-    // TODO: Command to change password and save it to eproom
     tiva_sim_handle_t sim_handle = (tiva_sim_handle_t)pv;
-//    tiva_logi("Reach sim task", 14);
-    TIVA_LOGE("this is log %d", (int)10);
      // setup module sim
     while (1) {
         if (!_at_and_expect(sim_handle, "AT+CREG?\r\n", "+CREG: 0,1", 1000, 5)) {
-            tiva_logi("fail CREG", 9);
+            TIVA_LOGI(TAG,"fail CREG");
             continue;
         }
         if (!_at_and_expect(sim_handle, "ATE0\r\n", "OK", 1000, 5)) {
-            tiva_logi("fail ATE0", 9);
+            TIVA_LOGI(TAG,"fail ATE0");
             continue;
         }
         if (!_at_and_expect(sim_handle, "AT+CNMI=2,2,2,0,0\r\n", "OK", 1000, 5)) {
-            tiva_logi("fail AT", 7);
+            TIVA_LOGI(TAG,"fail AT");
             continue;
         }
         break;
@@ -214,7 +212,7 @@ static void tiva_sim_task(void *pv)
         }
         if (recv_len > 0) {
             sim_handle->buffer[recv_len] = '\0';
-            tiva_logi(sim_handle->buffer, recv_len + 1);
+            TIVA_LOGI(TAG, "Receive : %s", sim_handle->buffer);
             if (is_new_message(sim_handle->buffer)) {
                 xSemaphoreTake(sim_handle->message_lock, portMAX_DELAY);
                 int sender_num_len = get_sender_number(sim_handle->buffer, sim_handle->message_received.sender_phone);
@@ -222,13 +220,13 @@ static void tiva_sim_task(void *pv)
                     continue;
                 }
                 sim_handle->message_received.sender_phone[sender_num_len] = '\0';
-                tiva_logi(sim_handle->message_received.sender_phone, sender_num_len + 1);
+                TIVA_LOGI(TAG, "sender number: %s", sim_handle->message_received.sender_phone);
                 int content_len = get_content_message(sim_handle->buffer, sim_handle->message_received.message);
                 if (content_len == 0 || content_len > TIVA_SIM_MESSAGE_SIZE) {
                     continue;
                 }
                 sim_handle->message_received.message[content_len] = '\0';
-                tiva_logi(sim_handle->message_received.message, content_len + 1);
+                TIVA_LOGI(TAG, "message content: %s", sim_handle->message_received.message);
                 sim_handle->new_message_ready = true;
                 xSemaphoreGive(sim_handle->message_lock);
             }

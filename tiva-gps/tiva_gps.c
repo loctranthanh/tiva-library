@@ -14,6 +14,8 @@
 #include "string.h"
 #include "tiva_log.h"
 
+#define TAG             "GPS"
+
 typedef struct tiva_gps_ {
     hw_uart_handle_t    uart_handle;
     char*               buffer;
@@ -75,7 +77,7 @@ static void tiva_gps_task(void *pv)
         if (NULL == end || '\n' != *(++end)) {
             continue;
         }
-//        tiva_logi(start, end - start + 1);
+        TIVA_LOGI(TAG, "NMEA content: %s", start, end - start + 1);
 
         if (strncmp(start, "$GPGGA", 6) == 0) {
             uint8_t success = 0;
@@ -86,14 +88,10 @@ static void tiva_gps_task(void *pv)
             /* Print messages */
             if (gps_handle->hgps.latitude != 0 && gps_handle->hgps.longitude != 0 && success == 1) {
                 gps_handle->data_available = true;
-                int len = sprintf(gps_handle->buffer, "Valid status: %d", gps_handle->hgps.is_valid);
-                tiva_logd((char*)gps_handle->buffer, len);
-                len = sprintf(gps_handle->buffer, "Latitude: %f degrees", gps_handle->hgps.latitude);
-                tiva_logi((char*)gps_handle->buffer, len);
-                len = sprintf(gps_handle->buffer, "Longitude: %f degrees", gps_handle->hgps.longitude);
-                tiva_logi((char*)gps_handle->buffer, len);
-                len = sprintf(gps_handle->buffer, "Time: %d:%d:%d", gps_handle->hgps.hours, gps_handle->hgps.minutes, gps_handle->hgps.seconds);
-                tiva_logi((char*)gps_handle->buffer, len);
+                TIVA_LOGD(TAG, "Valid status: %d", gps_handle->hgps.is_valid);
+                TIVA_LOGI(TAG, "Latitude: %f degrees", gps_handle->hgps.latitude);
+                TIVA_LOGI(TAG, "Longitude: %f degrees", gps_handle->hgps.longitude);
+                TIVA_LOGI(TAG, "Time: %d:%d:%d", gps_handle->hgps.hours, gps_handle->hgps.minutes, gps_handle->hgps.seconds);
             }
         }
 

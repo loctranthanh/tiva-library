@@ -42,6 +42,7 @@ void tiva_log_init(tiva_log_config_t log_config)
     g_log_handle->enable_log_error = log_config.enable_log_error;
     g_log_handle->enable_log_info = log_config.enable_log_info;
     g_log_handle->enable_log_warning = log_config.enable_log_warning;
+    g_log_handle->enable_log_debug = log_config.enable_log_debug;
     g_log_handle->uart_handle = tiva_uart_init(log_config.uart_config);
     if (g_log_handle->uart_handle == NULL) {
         free(g_log_handle->buffer);
@@ -97,7 +98,8 @@ bool tiva_log(int level, char* format, ...)
 {
     if (g_log_handle == NULL || format == NULL) {
         return false;
-    } else if (level == 0 && g_log_handle->enable_log_error == false) {
+    }
+    if (level == 0 && g_log_handle->enable_log_error == false) {
         return false;
     } else if (level == 1 && g_log_handle->enable_log_info == false) {
         return false;
