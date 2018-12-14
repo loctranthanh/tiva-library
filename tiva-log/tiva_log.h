@@ -42,12 +42,6 @@ typedef struct {
 
 void tiva_log_init(tiva_log_config_t log_config);
 
-//bool tiva_logi(char* format, ...);
-//
-//bool tiva_logd(char* content, uint16_t content_size);
-//
-//bool tiva_loge(char* format, ...);
-
 bool tiva_log(int level, char* format, ...);
 
 #define TIVA_LOGE(tag, format, ...) tiva_log(0, LOG_FORMAT(E, format), tag, ##__VA_ARGS__)

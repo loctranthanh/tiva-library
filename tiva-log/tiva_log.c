@@ -53,47 +53,6 @@ void tiva_log_init(tiva_log_config_t log_config)
     g_log_handle->mutext_lock = xSemaphoreCreateMutex();
 }
 
-//bool tiva_logi(char* content, uint16_t content_size)
-//{
-//    if (g_log_handle == NULL || g_log_handle->enable_log_info == false || content == NULL) {
-//        return false;
-//    }
-//    xSemaphoreTake(g_log_handle->mutext_lock, portMAX_DELAY);
-//    tiva_uart_write_bytes(g_log_handle->uart_handle, "[INFO] ", 7);
-//    tiva_uart_write_bytes(g_log_handle->uart_handle, (uint8_t*)content, content_size);
-//    tiva_uart_write_bytes(g_log_handle->uart_handle, "\r\n", 2);
-//    xSemaphoreGive(g_log_handle->mutext_lock);
-//    return true;
-//}
-//
-//bool tiva_logd(char* content, uint16_t content_size)
-//{
-//    if (g_log_handle == NULL || g_log_handle->enable_log_debug == false || content == NULL) {
-//        return false;
-//    }
-//    xSemaphoreTake(g_log_handle->mutext_lock, portMAX_DELAY);
-//    tiva_uart_write_bytes(g_log_handle->uart_handle, "[DEBUG] ", 8);
-//    tiva_uart_write_bytes(g_log_handle->uart_handle, (uint8_t*)content, content_size);
-//    tiva_uart_write_bytes(g_log_handle->uart_handle, "\r\n", 2);
-//    xSemaphoreGive(g_log_handle->mutext_lock);
-//    return true;
-//}
-//
-//bool tiva_loge(char* content, ...)
-//{
-//    if (g_log_handle == NULL || g_log_handle->enable_log_error == false || content == NULL) {
-//        return false;
-//    }
-//    xSemaphoreTake(g_log_handle->mutext_lock, portMAX_DELAY);
-//    va_list list;
-//    va_start(list, content);
-//    int len = vsprintf(g_log_handle->buffer, content, list);
-//    va_end(list);
-//    tiva_uart_write_bytes(g_log_handle->uart_handle, (uint8_t*)g_log_handle->buffer, len);
-//    xSemaphoreGive(g_log_handle->mutext_lock);
-//    return true;
-//}
-
 bool tiva_log(int level, char* format, ...)
 {
     if (g_log_handle == NULL || format == NULL) {
